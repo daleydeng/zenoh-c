@@ -1,0 +1,51 @@
+context:
+  name: zenoh-c
+  version: "1.1.0"
+
+package:
+  name: ${{ name }}
+  version: ${{ version }}
+
+source:
+#   url: https://github.com/eclipse-zenoh/zenoh-c/archive/refs/tags/${{ version }}.tar.gz
+#   sha256: 9f84289b212723aec546cef840f00399aaef13820ccf2d0f8c957b3c87f71088
+  git: https://github.com/eclipse-zenoh/zenoh-c.git
+  tag: ${{ version }}
+  patches:
+    - fix_rust_toolchain.patch
+    - 469.patch
+
+build:
+  number: 1000
+
+requirements:
+  build:
+    - ${{ compiler('rust') }}
+    - ${{ compiler('c') }}
+    - ${{ compiler('cxx') }}
+    - cargo-bundle-licenses
+    - cmake
+    - ninja
+    - pkg-config
+  host:
+    - zenoh-rust-abi ${{ version }}.*
+  run_exports:
+    - ${{ pin_subpackage(name, upper_bound='x.x.x') }}
+
+tests:
+  - script:
+      - if: unix
+        then: test -f ${PREFIX}/lib/libzenohc${SHLIB_EXT}
+      - if: win
+        then: if not exist %PREFIX%\\Library\\lib\\zenohc.dll.lib exit 1
+      - if: win
+        then: if not exist %PREFIX%\\Library\\bin\\zenohc.dll exit 1
+
+about:
+  license: Apache-2.0 OR EPL-2.0
+  license_file:
+    - LICENSE
+    - THIRDPARTY.yml
+  summary: C API for Zenoh
+  homepage: https://github.com/eclipse-zenoh/zenoh-c
+

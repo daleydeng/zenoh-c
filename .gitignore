@@ -81,3 +81,5 @@ src/opaque_types/mod.rs
 CMakeFiles/
 debug/
 release/
+
+tmp/
